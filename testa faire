@@ -1,0 +1,168 @@
+Voici une liste complète de tests pour vérifier que ton minishell fonctionne correctement selon tous les critères d'évaluation :
+Tests de base
+
+
+////////////////////////////////////////// TAB SOUCIS
+Commande vide (juste appuyer sur Entrée)
+Commande avec seulement des espaces ou tabulations  
+Commande inexistante: commandequinexistepas
+Commande avec beaucoup d'arguments: echo 1 2 3 4 5 6 7 8 9 10 ... 50
+
+Commandes simples avec chemin absolu
+
+/bin/ls
+/bin/pwd
+/usr/bin/grep test
+
+Historique
+
+Taper quelques commandes puis utiliser les flèches haut/bas
+Vérifier que les commandes sont bien sauvegardées
+
+Commandes builtin - echo
+
+//////////////////////////////////////// ECHO -N SOUCIS
+echo test							
+echo test1 test2 test3
+echo -n test (pas de nouvelle ligne)
+echo -nnnnn test (pas de nouvelle ligne)
+echo -n -n -n test (considéré comme des arguments, pas options)
+
+Commandes builtin - cd
+
+cd /tmp (chemin absolu)
+cd .. (chemin relatif)
+cd . (répertoire courant)
+cd (aller au HOME)
+cd - (revenir au répertoire précédent)
+cd dossierquinexistepas (erreur)
+
+Commandes builtin - pwd
+
+pwd
+pwd dossier (arguments ignorés)
+
+Commandes builtin - export
+/////////////////////////////////////////////export affiche pas la nouvelle var
+export (afficher toutes les variables)
+export VAR=value (créer/modifier une variable)
+export VAR1=value1 VAR2=value2 (plusieurs variables)
+export VAR+=additionalValue (ajouter à une variable)
+
+Commandes builtin - unset
+
+unset VAR (supprimer une variable)
+unset VAR1 VAR2 (supprimer plusieurs variables)
+unset VARQUINEXISTEPAS (aucune erreur)
+
+Commandes builtin - env
+
+
+///////////////////////////////////////////////////IGNORE PAS LES ARGUMENT
+env (afficher toutes les variables d'environnement)
+env VAR (ignorer les arguments)
+
+Commandes builtin - exit
+
+exit (quitter le shell)
+exit 42 (quitter avec code spécifique)
+exit too many arguments (erreur)
+exit non_numeric (erreur)
+
+Variables d'environnement
+
+echo $USER (afficher valeur de USER)
+echo "$USER" (afficher valeur dans guillemets doubles)
+echo '$USER' (afficher littéralement '$USER')
+echo $? (afficher code retour précédent)
+echo "$?" (afficher code retour dans guillemets doubles)
+echo $VARQUINEXISTEPAS (afficher chaîne vide)
+
+Codes de retour
+/////////////////////////////////////////////////////a revoir je capte pas trop
+ls /tmp; echo $? (code 0 - succès)
+ls /dossierquinexistepas; echo $? (code d'erreur)
+false; echo $? (code 1)
+/bin/ls fichiernexistepas; echo $? (code d'erreur)
+
+Redirections
+//////////////////////////////////////// a revoir certains elements
+ls > fichier.txt (redirection sortie)
+cat < fichier.txt (redirection entrée)
+ls >> fichier.txt (redirection sortie en mode append)
+cat << EOF (heredoc)
+wc -l < fichier.txt > resultat.txt (entrée et sortie)
+ls > fichier1 > fichier2 (redirection multiple)
+ls > /dev/null (redirection vers périphérique)
+
+Pipes
+                           ////////////////////////////////// a revoir aussi 
+ls | grep test
+ls | grep test | wc -l
+ls | grep test | sort | uniq
+cat /dev/urandom | head -c 100 | hexdump
+echo test | cat -e
+
+Pipes et redirections combinés
+
+ls | grep test > fichier.txt
+cat < fichier.txt | grep a | wc -l > resultat.txt
+ls /dossierquinexistepas | grep test (erreur dans la première commande)
+
+Chemin relatif et PATH
+
+ls (sans chemin absolu)
+grep test fichier.txt
+export PATH=/usr/bin (modifier PATH)
+ls (après modification de PATH)
+unset PATH (supprimer PATH)
+ls (après suppression de PATH - doit échouer)
+
+Signaux
+
+Ctrl+C pendant prompt vide (nouveau prompt)
+Ctrl+C après avoir tapé quelque chose (nouveau prompt, ligne effacée)
+Ctrl+D pendant prompt vide (quitter le shell)
+Ctrl+D après avoir tapé quelque chose (ne rien faire)
+Ctrl+\ pendant prompt (ne rien faire)
+Ctrl+C pendant l'exécution d'une commande bloquante comme cat (interrompre)
+Ctrl+\ pendant l'exécution d'une commande bloquante (core dump)
+
+Guillemets
+
+echo "test"
+echo 'test'
+echo "L'apostrophe"
+echo 'Les "guillemets"'
+echo "Variable $USER"
+echo 'Variable $USER'
+echo "Guillemets \"échappés\""
+echo "Test multi ligne"
+
+Bonus - Opérateurs logiques
+
+ls && echo "success"
+ls || echo "failure"
+ls /dossierquinexistepas && echo "success"
+ls /dossierquinexistepas || echo "failure"
+ls && echo "ok" && pwd
+(ls && echo "ok") || echo "fail"
+
+Bonus - Wildcards
+
+ls *.c
+rm -f *.tmp
+echo *
+cp *.txt /tmp/
+
+Tests de robustesse et cas limites
+
+Lignes très longues
+Redirections vers des fichiers sans permission
+Commandes avec beaucoup de pipes (10+)
+Nesting profond de guillemets
+Caractères spéciaux dans les noms de fichiers
+Signaux rapides et répétés
+EOF dans heredoc
+
+Ces tests couvrent l'ensemble des fonctionnalités requises pour ton minishell et devraient te permettre de vérifier que tout fonctionne conformément aux attentes du projet.

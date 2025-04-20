@@ -1,0 +1,245 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcaccava <tcaccava@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/11 23:18:09 by tcaccava          #+#    #+#             */
+/*   Updated: 2025/04/12 11:54:52 by tcaccava         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcaccava <tcaccava@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/06 09:16:36 by tcaccava          #+#    #+#             */
+/*   Updated: 2025/04/11 22:31:14 by tcaccava         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+// int	main(int argc, char **argv, char **envp)
+// {
+// 	char		*write;
+// 	char		**arguments;
+// 	int			i;
+// 	char		*path;
+// 	char		**paths;
+// 	int			path_count;
+// 	int			arg_count;
+// 	char		**cpaths;
+// 	int			y;
+// 	int			z;
+// 	t_token		*token;
+// 	t_command	*commands;
+// 	t_tree_node	*root;
+// 	int			status;
+// 	int			exit_status;
+// 	pid_t		pid;
+// 	char		*test_arg;
+// 	t_command	*test_cmd;
+
+// 	(void)argc;
+// 	(void)argv;
+// 	while (1)
+// 	{
+// 		write = readline("prompt% ");
+// 		if (!write)
+// 			break ;
+// 		if (write)
+// 			add_history(write);
+// 		arguments = ft_split(write, ' ');
+// 		i = 0;
+// 		while (arguments[i])
+// 		{
+// 			if (is_builtin(arguments[i]))
+// 				printf("%s is a built-in command\n", arguments[i]);
+// 			i++;
+// 		}
+// 		path = getenv("PATH");
+// 		paths = ft_split(path, ':');
+// 		path_count = 0;
+// 		while (paths[path_count])
+// 			path_count++;
+// 		arg_count = 0;
+// 		while (arguments[arg_count])
+// 			arg_count++;
+// 		cpaths = malloc(sizeof(char *) * (path_count * arg_count + 1));
+// 		i = 0;
+// 		y = 0;
+// 		z = 0;
+// 		while (arguments[i])
+// 		{
+// 			y = 0;
+// 			while (paths[y])
+// 			{
+// 				cpaths[z] = concat_path(paths[y], arguments[i]);
+// 				y++;
+// 				z++;
+// 			}
+// 			i++;
+// 		}
+// 		cpaths[z] = NULL;
+// 		i = 0;
+// 		while (cpaths[i])
+// 		{
+// 			if (access(cpaths[i], X_OK) == 0 && !is_builtin(cpaths[i]))
+// 				printf("%s is a command\n", cpaths[i]);
+// 			i++;
+// 		}
+// 		if (ft_strcmp(write, "clear") == 0)
+// 			rl_clear_history();
+// 		if (strcmp(write, "exit") == 0)
+// 		{
+// 			free(write);
+// 			break ;
+// 		}
+// 		pid = fork();
+// 		if (pid == 0)
+// 		{
+// 			root = build_tree(commands);
+// 			print_tree(root, 0);
+// 			exit(42);
+// 		}
+// 		else
+// 		{
+// 			waitpid(pid, &status, 0);
+// 			exit_status = WEXITSTATUS(status);
+// 		}
+// 		token = tokenize(write);
+// 		if (token)
+// 			print_tokens(token);
+// 		commands = parse(token, envp, exit_status);
+// 		print_commands(commands);
+// 		root = build_tree(commands);
+// 		if (ft_strcmp(write, "test_wildcards") == 0)
+// 		{
+// 			test_arg = ft_strdup("*.c");
+// 			test_cmd = init_cmd();
+// 			add_to_args(test_cmd, test_arg);
+// 			printf("Prima dell'espansione: %s\n", test_cmd->args[0]);
+// 			process_args_with_wildcards(test_cmd);
+// 			printf("Dopo l'espansione:\n");
+// 			for (int i = 0; test_cmd->args[i]; i++)
+// 				printf("  %s\n", test_cmd->args[i]);
+// 			// Liberare la memoria...
+// 			free(write);
+// 			continue ;
+// 		}
+// 		// if (ft_strcmp(write, "alert") == 0)
+// 		// {
+// 		// 	rl_redisplay();
+// 		// 	printf("Malware detected\n");
+// 		// 	rl_replace_line("prova", 0);
+// 		// 	rl_redisplay();
+// 		// }
+// 		// free(write);
+// 	}
+// }
+
+#include "minishell.h"
+#include <readline/history.h>
+#include <readline/readline.h>
+
+int	main(int argc, char **argv, char **envp)
+{
+	char		*line;
+	t_token		*tokens;
+	t_tree_node	*tree;
+	t_command	*cmd_list;
+	pid_t		pid;
+	int			status;
+	int			exit_status;
+
+	(void)argc;
+	(void)argv;
+	exit_status = 0;
+	while (1)
+	{
+		line = readline("prompt% ");
+		if (!line)
+			break ;
+		if (line[0])
+			add_history(line);
+		tokens = tokenize(line);
+		printf("Tokens:\n");
+		print_tokens(tokens);
+		pid = fork();
+		if (pid == 0)
+			exit(42);
+		else
+		{
+			waitpid(pid, &status, 0);
+			exit_status = WEXITSTATUS(status);
+		}
+		cmd_list = parse(tokens, envp, exit_status);
+		printf("Command:\n");
+		print_commands(cmd_list);
+		tree = build_tree(cmd_list);
+		if (tree)
+		{
+			printf("Tree:\n");
+			print_tree(tree, 0);
+		}
+		// Libera tutto
+	}
+	return (0);
+}
+
+void	free_commands(t_command *cmd)
+{
+	int			i;
+	t_command	*temp;
+
+	while (cmd)
+	{
+		temp = cmd->next;
+		if (cmd->args)
+		{
+			i = 0;
+			while (cmd->args[i])
+			{
+				free(cmd->args[i]);
+				i++;
+			}
+			free(cmd->args);
+		}
+		if (cmd->input_file)
+			free(cmd->input_file);
+		if (cmd->output_file)
+			free(cmd->output_file);
+		free(cmd);
+		cmd = temp;
+	}
+}
+
+void	free_tree(t_tree_node *node)
+{
+	if (!node)
+		return ;
+	free_tree(node->left);
+	free_tree(node->right);
+	if (node->type == NODE_COMMAND && node->cmd)
+		free_commands(node->cmd);
+	free(node);
+}
+
+void	free_tokens(t_token *tokens)
+{
+	t_token	*temp;
+
+	while (tokens)
+	{
+		temp = tokens->next;
+		if (tokens->value)
+			free(tokens->value);
+		free(tokens);
+		tokens = temp;
+	}
+}

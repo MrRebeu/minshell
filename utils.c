@@ -1,38 +1,109 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcaccava <tcaccava@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/29 13:35:09 by tcaccava          #+#    #+#             */
+/*   Updated: 2025/04/12 06:54:51 by tcaccava         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-int	ft_strcmp(char *s1, char *s2)
+char	*ft_strdup(const char *s)
 {
-	int i;
+	char	*dup;
+	size_t	i;
 
 	i = 0;
-	if (!s1 || !s2)
-		return (s1 == s2 ? 0 : (s1 ? 1 : -1));
-	while (s1[i] == s2[i] && s1[i] != '\0' && s2[i] != '\0')
+	if (!s)
+		return (NULL);
+	dup = (char *)malloc(sizeof(char) * (ft_strlen(s) + 1));
+	if (!dup)
+		return (NULL);
+	while (s[i])
+	{
+		dup[i] = s[i];
 		i++;
-	return (s1[i] - s2[i]);
+	}
+	dup[i] = '\0';
+	return (dup);
 }
 
-int set_env_var(char ***envp, const char *name, const char *value)
+char	*ft_strstr(const char *haystack, const char *needle)
 {
-    int i = 0;
-    size_t len_name = ft_strlen(name);
-    char *new = malloc(sizeof(char) * (len_name + ft_strlen(value) + 2));
-    if (!new)
-        return (1);
+	int	i;
+	int	j;
 
-    ft_strcpy(new, name);
-    ft_strcat(new, "=");
-    ft_strcat(new, value);
-    while ((*envp)[i])
-    {
-        if (ft_strncmp((*envp)[i], name, len_name) == 0 && (*envp)[i][len_name] == '=')
-        {
-            free((*envp)[i]);
-            (*envp)[i] = new;
-            return (0);
-        }
-        i++;
-    }
-    free(new);
-    return (1);
+	if (!*needle)
+		return ((char *)haystack);
+	i = 0;
+	while (haystack[i])
+	{
+		j = 0;
+		while (needle[j] && haystack[i + j] == needle[j])
+			j++;
+		if (!needle[j])
+			return ((char *)(haystack + i));
+		i++;
+	}
+	return (NULL);
+}
+
+char	*ft_substr(char *s, unsigned int start, size_t len)
+{
+	char	*substr;
+	size_t	i;
+	size_t	j;
+
+	j = 0;
+	i = 0;
+	if (!s)
+		return (NULL);
+	substr = (char *)malloc(sizeof(char) * (len + 1));
+	if (!substr)
+		return (NULL);
+	while (s[i])
+	{
+		if (i >= start && i < start + len)
+		{
+			substr[j] = s[i];
+			j++;
+		}
+		i++;
+	}
+	substr[j] = '\0';
+	return (substr);
+}
+
+char	*ft_strcpy(char *dest, const char *src)
+{
+	char	*original_dest;
+
+	original_dest = dest;
+	if (!src)
+		return (NULL);
+	while (*src)
+	{
+		*dest = *src;
+		dest++;
+		src++;
+	}
+	*dest = '\0';
+	return (original_dest);
+}
+
+size_t	ft_strlen(const char *str)
+{
+	size_t	i;
+
+	i = 0;
+	while (*str)
+	{
+		i++;
+		str++;
+	}
+	return (i);
 }

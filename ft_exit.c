@@ -7,7 +7,7 @@ int ft_exit(t_tree_node *root)
 
     if (root->cmd->args[1])
     {
-        int i = 0;
+        i = 0;
         while (root->cmd->args[1][i])
         {
             if (root->cmd->args[1][i] < '0' || root->cmd->args[1][i] > '9')
@@ -28,5 +28,6 @@ int ft_exit(t_tree_node *root)
     }
     printf("exit\n");
     rl_clear_history();
-    return(exit(exit_code));
+    exit(exit_code);
+    return (exit_code);
 }

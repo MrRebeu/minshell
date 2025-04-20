@@ -28,5 +28,6 @@ int ft_exit(t_tree_node *root)
     }
     printf("exit\n");
     rl_clear_history();
-    return(exit(exit_code));
+    exit(exit_code);
+    return (exit_code);
 }
