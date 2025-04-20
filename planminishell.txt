@@ -1,0 +1,204 @@
+
+# PLAN D'IMPLÉMENTATION MINISHELL
+## PROJET 42
+
+### INTRODUCTION
+Ce document présente un plan détaillé pour l'implémentation de la partie exécution
+ du projet Minishell. Il est conçu pour être utilisé comme référence tout au long
+  du développement, avec une progression logique des fonctionnalités à implémenter.
+
+### TABLE DES MATIÈRES
+1. Préparation du projet
+2. Gestion de l'environnement et des variables
+3. Exécution de commandes simples
+4. Commandes intégrées (builtins)
+5. Redirections
+6. Pipes
+7. Signaux
+8. Bonus: Opérateurs logiques et wildcards
+9. Tests et débogage
+
+### 1. PRÉPARATION DU PROJET
+
+#### 1.1. Structures de données
+- Définir la structure pour représenter une commande
+- Définir la structure pour représenter les redirections
+- Définir la structure pour représenter les pipes et opérateurs
+- Définir la structure pour stocker l'environnement
+
+#### 1.2. Initialisation du shell
+- Configurer le prompt avec readline
+- Initialiser l'historique des commandes
+- Créer la boucle principale du shell
+- Mettre en place la récupération des entrées utilisateur
+
+#### 1.3. Interface avec le parsing
+- Établir la spécification des données reçues du parser
+- Définir clairement les responsabilités entre parsing et exécution
+- Créer des fonctions de test pour simuler les entrées du parser
+
+### 2. GESTION DE L'ENVIRONNEMENT ET DES VARIABLES
+
+#### 2.1. Variables d'environnement
+- Initialiser les variables depuis envp
+- Créer les fonctions de manipulation:
+  - Rechercher une variable
+  - Ajouter/modifier une variable
+  - Supprimer une variable
+  - Convertir vers format clé=valeur pour execve
+
+#### 2.2. Expansion de variables
+- Implémenter la détection des variables ($VAR)
+- Créer la fonction de remplacement par les valeurs
+- Gérer le cas spécial $? (statut de sortie)
+- Implémenter la différence d'expansion entre guillemets simples et doubles
+
+### 3. EXÉCUTION DE COMMANDES SIMPLES
+
+#### 3.1. Résolution des chemins
+- Rechercher les exécutables dans PATH
+- Gérer les chemins absolus et relatifs
+- Vérifier les permissions d'exécution
+- Gérer les erreurs (commande introuvable, permissions)
+
+#### 3.2. Création de processus
+- Implémenter la logique fork/execve
+- Gérer le processus parent (attente, récupération du statut)
+- Configurer correctement les arguments et l'environnement
+- Mettre à jour la variable $? avec le statut de sortie
+
+### 4. COMMANDES INTÉGRÉES (BUILTINS)
+
+#### 4.1. Détection et exécution
+- Créer le système de détection des builtins
+- Implémenter le routage vers la fonction appropriée
+- Gérer les codes de retour des builtins
+
+#### 4.2. Implémentation des builtins simples
+- `echo`: Afficher du texte (avec option -n)
+- `pwd`: Afficher le répertoire courant
+- `env`: Afficher les variables d'environnement
+
+#### 4.3. Implémentation des builtins complexes
+- `cd`: Changer de répertoire (avec gestion de PWD/OLDPWD)
+- `export`: Ajouter/modifier des variables d'environnement
+- `unset`: Supprimer des variables d'environnement
+- `exit`: Quitter le shell avec un code de sortie
+
+### 5. REDIRECTIONS
+
+#### 5.1. Redirection d'entrée
+- Implémenter < (redirection depuis un fichier)
+- Gérer les erreurs (fichier inexistant, permissions)
+- Sauvegarder/restaurer les descripteurs originaux
+
+#### 5.2. Redirection de sortie
+- Implémenter > (écraser le fichier)
+- Implémenter >> (ajouter au fichier)
+- Gérer les erreurs (permissions, création)
+
+#### 5.3. Here-document
+- Implémenter << (lire jusqu'au délimiteur)
+- Créer le mécanisme de lecture et stockage temporaire
+- S'assurer du bon fonctionnement sans mise à jour de l'historique
+
+### 6. PIPES
+
+#### 6.1. Pipes simples
+- Implémenter la création de pipes avec pipe()
+- Configurer la communication entre deux commandes
+- Gérer correctement les descripteurs de fichiers
+
+#### 6.2. Chaînes de pipes
+- Étendre l'implémentation pour supporter plusieurs pipes
+- Gérer les redirections en combinaison avec les pipes
+- Assurer la fermeture appropriée de tous les descripteurs
+
+#### 6.3. Gestion des processus
+- Exécuter chaque commande dans un processus séparé
+- Synchroniser correctement les processus (wait/waitpid)
+- Récupérer le statut de sortie du dernier processus
+
+### 7. SIGNAUX
+
+#### 7.1. Configuration des gestionnaires
+- Définir la variable globale pour stocker le numéro de signal
+- Configurer les gestionnaires avec sigaction
+- Implémenter les comportements différents pour parent/enfant
+
+#### 7.2. Comportements spécifiques
+- SIGINT (Ctrl+C): Afficher un nouveau prompt
+- SIGQUIT (Ctrl+\\): Ne rien faire en mode interactif
+- EOF (Ctrl+D): Quitter proprement le shell
+
+#### 7.3. Gestion dans les processus enfants
+- Restaurer les comportements par défaut dans les enfants
+- Gérer correctement les terminaisons de processus
+
+### 8. BONUS: OPÉRATEURS LOGIQUES ET WILDCARDS
+
+#### 8.1. Opérateurs logiques
+- Implémenter && (exécution conditionnelle si succès)
+- Implémenter || (exécution conditionnelle si échec)
+- Gérer l'évaluation des expressions complexes
+
+#### 8.2. Parenthèses pour priorités
+- Implémenter un système d'évaluation récursive
+- Gérer correctement les priorités d'opérations
+- Assurer la compatibilité avec les autres fonctionnalités
+
+#### 8.3. Wildcards (*)
+- Implémenter l'expansion des wildcards dans le répertoire courant
+- Trier les résultats alphabétiquement
+- Gérer le cas où aucun fichier ne correspond
+
+### 9. TESTS ET DÉBOGAGE
+
+#### 9.1. Tests unitaires
+- Tester chaque composant individuellement
+- Vérifier le comportement des builtins
+- Tester les redirections et pipes de base
+
+#### 9.2. Tests d'intégration
+- Tester des commandes complexes
+- Vérifier le comportement avec des entrées invalides
+- Comparer avec le comportement de bash
+
+#### 9.3. Gestion mémoire
+- Vérifier les fuites avec Valgrind
+- S'assurer de la libération correcte des ressources
+- Vérifier la fermeture de tous les descripteurs de fichiers
+
+### ANNEXE: CHECKLIST DE FONCTIONNALITÉS
+
+#### A. Fonctionnalités obligatoires
+- [ ] Affichage du prompt
+- [ ] Historique fonctionnel
+- [ ] Recherche et exécution des commandes
+- [ ] Guillemets simples et doubles
+- [ ] Redirections (< > << >>)
+- [ ] Pipes (|)
+- [ ] Variables d'environnement ($VAR)
+- [ ] $? (statut de sortie)
+- [ ] Signaux (Ctrl+C, Ctrl+D, Ctrl+\\)
+- [ ] Builtins (echo, cd, pwd, export, unset, env, exit)
+
+#### B. Fonctionnalités bonus
+- [ ] Opérateurs logiques (&& et ||)
+- [ ] Parenthèses pour priorités
+- [ ] Wildcards (*) pour le répertoire courant
+
+#### C. Gestion des erreurs
+- [ ] Commandes introuvables
+- [ ] Permissions insuffisantes
+- [ ] Fichiers inexistants
+- [ ] Syntaxe incorrecte
+- [ ] Fuites mémoire
+
+### CONCLUSION
+Ce plan détaille l'ensemble des fonctionnalités à implémenter 
+pour la partie exécution du projet Minishell. Suis-le pas à pas
+ pour assurer une progression méthodique et éviter d'oublier
+  des fonctionnalités. N'oublie pas de communiquer 
+  régulièrement avec ton partenaire responsable du 
+  parsing pour assurer une bonne compatibilité entre les modules.
